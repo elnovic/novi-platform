@@ -197,3 +197,84 @@ export async function getOpportunites() {
   if (error) throw error
   return data || []
 }
+// ─── AUTHENTIFICATION ───
+export async function inscrireUtilisateur(data: {
+  nom: string
+  prenom: string
+  email: string
+  motdepasse: string
+  niveau: string
+  objectifs: string[]
+  domaines: string[]
+}) {
+  // 1. Créer le compte Auth
+  const { data: authData, error: authError } = await supabase.auth.signUp({
+    email: data.email,
+    password: data.motdepasse,
+    options: {
+      data: {
+        nom: data.nom,
+        prenom: data.prenom
+      }
+    }
+  })
+  if (authError) throw authError
+
+  // 2. Créer le profil dans la table utilisateurs
+  const { error: profileError } = await supabase
+    .from('utilisateurs')
+    .insert({
+      auth_id: authData.user?.id,
+      nom: data.nom,
+      prenom: data.prenom,
+      email: data.email,
+      niveau: data.niveau,
+      objectifs: data.objectifs,
+      domaines: data.domaines
+    })
+  if (profileError) throw profileError
+
+  return authData
+}
+
+export async function connecterUtilisateur(email: string, motdepasse: string) {
+  const { data, error } = await supabase.auth.signInWithPassword({
+    email,
+    password: motdepasse
+  })
+  if (error) throw error
+  return data
+}
+
+export async function deconnecterUtilisateur() {
+  const { error } = await supabase.auth.signOut()
+  if (error) throw error
+}
+
+export async function getUtilisateurConnecte() {
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return null
+
+  const { data, error } = await supabase
+    .from('utilisateurs')
+    .select('*')
+    .eq('auth_id', user.id)
+    .single()
+
+  if (error) return null
+  return data
+}
+
+export async function ecouterAuthChangements(callback: (user: any) => void) {
+  const { data: { subscription } } = supabase.auth.onAuthStateChange(
+    async (event, session) => {
+      if (session?.user) {
+        const profil = await getUtilisateurConnecte()
+        callback(profil)
+      } else {
+        callback(null)
+      }
+    }
+  )
+  return subscription
+}

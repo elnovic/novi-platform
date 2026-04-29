@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
+import { connecterUtilisateur } from '@/lib/supabase'
 
 export default function Login() {
   const [form, setForm] = useState({ email: '', motdepasse: '' })
@@ -18,16 +19,23 @@ export default function Login() {
     }
     setErreur('')
     setChargement(true)
-    setTimeout(() => {
-      setChargement(false)
+    try {
+      await connecterUtilisateur(form.email, form.motdepasse)
       window.location.href = '/dashboard'
-    }, 1500)
+    } catch (e: any) {
+      setErreur(e.message || 'Email ou mot de passe incorrect.')
+    } finally {
+      setChargement(false)
+    }
+  }
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') soumettre()
   }
 
   return (
     <main className="min-h-screen bg-gray-50 flex flex-col items-center justify-center px-4 py-12">
 
-      {/* Logo */}
       <Link href="/" className="flex items-center gap-2 mb-8">
         <Image src="/logo.png" alt="NOVI" width={36} height={36} />
         <div>
@@ -36,7 +44,6 @@ export default function Login() {
         </div>
       </Link>
 
-      {/* Carte */}
       <div className="bg-white rounded-2xl border border-gray-100 p-8 w-full max-w-md space-y-5">
 
         <div>
@@ -46,13 +53,10 @@ export default function Login() {
 
         <div>
           <label className="text-xs font-medium text-gray-600 mb-1 block">Adresse email</label>
-          <input
-            type="email"
-            placeholder="jean@exemple.com"
-            value={form.email}
+          <input type="email" placeholder="jean@exemple.com" value={form.email}
             onChange={e => setForm(prev => ({ ...prev, email: e.target.value }))}
-            className={inputClass}
-          />
+            onKeyDown={handleKeyDown}
+            className={inputClass} />
         </div>
 
         <div>
@@ -62,22 +66,16 @@ export default function Login() {
               Mot de passe oublié ?
             </Link>
           </div>
-          <input
-            type="password"
-            placeholder="Ton mot de passe"
-            value={form.motdepasse}
+          <input type="password" placeholder="Ton mot de passe" value={form.motdepasse}
             onChange={e => setForm(prev => ({ ...prev, motdepasse: e.target.value }))}
-            className={inputClass}
-          />
+            onKeyDown={handleKeyDown}
+            className={inputClass} />
         </div>
 
         {erreur && <p className="text-xs text-red-500">{erreur}</p>}
 
-        <button
-          onClick={soumettre}
-          disabled={chargement}
-          className="w-full bg-blue-600 text-white py-3 rounded-xl font-medium hover:bg-blue-700 transition-colors text-sm disabled:opacity-60"
-        >
+        <button onClick={soumettre} disabled={chargement}
+          className="w-full bg-blue-600 text-white py-3 rounded-xl font-medium hover:bg-blue-700 transition-colors text-sm disabled:opacity-60">
           {chargement ? 'Connexion...' : 'Se connecter'}
         </button>
 

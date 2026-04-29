@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
-import { creerUtilisateur } from '@/lib/supabase'
+import { inscrireUtilisateur } from '@/lib/supabase'
 
 export default function Register() {
   const [etape, setEtape] = useState(1)
@@ -67,10 +67,11 @@ export default function Register() {
     setErreur('')
     setChargement(true)
     try {
-      await creerUtilisateur({
+      await inscrireUtilisateur({
         nom: form.nom,
         prenom: form.prenom,
         email: form.email,
+        motdepasse: form.motdepasse,
         niveau: form.niveau,
         objectifs: form.objectifs,
         domaines: form.domaines
@@ -86,7 +87,6 @@ export default function Register() {
   return (
     <main className="min-h-screen bg-gray-50 flex flex-col items-center justify-center px-4 py-12">
 
-      {/* Logo */}
       <Link href="/" className="flex items-center gap-2 mb-8">
         <Image src="/logo.png" alt="NOVI" width={36} height={36} />
         <div>
@@ -95,10 +95,8 @@ export default function Register() {
         </div>
       </Link>
 
-      {/* Carte */}
       <div className="bg-white rounded-2xl border border-gray-100 p-8 w-full max-w-md">
 
-        {/* Étapes */}
         {etape < 4 && (
           <div className="flex items-center gap-2 mb-8">
             {[1, 2, 3].map(n => (
@@ -116,7 +114,7 @@ export default function Register() {
           </div>
         )}
 
-        {/* ÉTAPE 1 — Informations personnelles */}
+        {/* ÉTAPE 1 */}
         {etape === 1 && (
           <div className="space-y-5">
             <div>
@@ -127,78 +125,54 @@ export default function Register() {
             <div className="grid grid-cols-2 gap-3">
               <div>
                 <label className="text-xs font-medium text-gray-600 mb-1 block">Prénom</label>
-                <input
-                  type="text"
-                  placeholder="Jean"
-                  value={form.prenom}
+                <input type="text" placeholder="Jean" value={form.prenom}
                   onChange={e => setForm(prev => ({ ...prev, prenom: e.target.value }))}
-                  className={inputClass}
-                />
+                  className={inputClass} />
               </div>
               <div>
                 <label className="text-xs font-medium text-gray-600 mb-1 block">Nom</label>
-                <input
-                  type="text"
-                  placeholder="Dupont"
-                  value={form.nom}
+                <input type="text" placeholder="Dupont" value={form.nom}
                   onChange={e => setForm(prev => ({ ...prev, nom: e.target.value }))}
-                  className={inputClass}
-                />
+                  className={inputClass} />
               </div>
             </div>
 
             <div>
               <label className="text-xs font-medium text-gray-600 mb-1 block">Adresse email</label>
-              <input
-                type="email"
-                placeholder="jean@exemple.com"
-                value={form.email}
+              <input type="email" placeholder="jean@exemple.com" value={form.email}
                 onChange={e => setForm(prev => ({ ...prev, email: e.target.value }))}
-                className={inputClass}
-              />
+                className={inputClass} />
             </div>
 
             <div>
               <label className="text-xs font-medium text-gray-600 mb-1 block">Mot de passe</label>
-              <input
-                type="password"
-                placeholder="Minimum 8 caractères"
-                value={form.motdepasse}
+              <input type="password" placeholder="Minimum 8 caractères" value={form.motdepasse}
                 onChange={e => setForm(prev => ({ ...prev, motdepasse: e.target.value }))}
-                className={inputClass}
-              />
+                className={inputClass} />
             </div>
 
             <div>
               <label className="text-xs font-medium text-gray-600 mb-1 block">Confirmer le mot de passe</label>
-              <input
-                type="password"
-                placeholder="Répète ton mot de passe"
-                value={form.confirmation}
+              <input type="password" placeholder="Répète ton mot de passe" value={form.confirmation}
                 onChange={e => setForm(prev => ({ ...prev, confirmation: e.target.value }))}
-                className={inputClass}
-              />
+                className={inputClass} />
             </div>
 
             {erreur && <p className="text-xs text-red-500">{erreur}</p>}
 
-            <button
-              onClick={validerEtape1}
-              className="w-full bg-blue-600 text-white py-3 rounded-xl font-medium hover:bg-blue-700 transition-colors text-sm"
-            >
+            <button onClick={validerEtape1}
+              className="w-full bg-blue-600 text-white py-3 rounded-xl font-medium hover:bg-blue-700 transition-colors text-sm">
               Continuer →
             </button>
 
             <p className="text-center text-xs text-gray-400">
               Déjà un compte ?{' '}
-              <Link href="/login" className="text-blue-600 hover:underline">
-                Se connecter
-              </Link>
+              <Link href="/login" className="text-blue-600 hover:underline">Se connecter</Link>
             </p>
           </div>
         )}
 
-        {/* ÉTAPE 2 — Niveau */}
+        {/* ÉTAPE 2 */}
         {etape === 2 && (
           <div className="space-y-5">
             <div>
@@ -208,15 +182,12 @@ export default function Register() {
 
             <div className="space-y-3">
               {niveaux.map(n => (
-                <button
-                  key={n}
-                  onClick={() => setForm(prev => ({ ...prev, niveau: n }))}
+                <button key={n} onClick={() => setForm(prev => ({ ...prev, niveau: n }))}
                   className={`w-full text-left px-4 py-3.5 rounded-xl border text-sm transition-all ${
                     form.niveau === n
                       ? 'border-2 border-blue-500 bg-blue-50 text-blue-700 font-medium'
                       : 'border border-gray-200 text-gray-700 hover:border-blue-300'
-                  }`}
-                >
+                  }`}>
                   {n}
                 </button>
               ))}
@@ -225,23 +196,19 @@ export default function Register() {
             {erreur && <p className="text-xs text-red-500">{erreur}</p>}
 
             <div className="flex gap-3">
-              <button
-                onClick={() => setEtape(1)}
-                className="flex-1 py-3 rounded-xl border border-gray-200 text-gray-600 text-sm hover:bg-gray-50 transition-colors"
-              >
+              <button onClick={() => setEtape(1)}
+                className="flex-1 py-3 rounded-xl border border-gray-200 text-gray-600 text-sm hover:bg-gray-50 transition-colors">
                 ← Retour
               </button>
-              <button
-                onClick={validerEtape2}
-                className="flex-1 bg-blue-600 text-white py-3 rounded-xl font-medium hover:bg-blue-700 transition-colors text-sm"
-              >
+              <button onClick={validerEtape2}
+                className="flex-1 bg-blue-600 text-white py-3 rounded-xl font-medium hover:bg-blue-700 transition-colors text-sm">
                 Continuer →
               </button>
             </div>
           </div>
         )}
 
-        {/* ÉTAPE 3 — Objectifs et domaines */}
+        {/* ÉTAPE 3 */}
         {etape === 3 && (
           <div className="space-y-5">
             <div>
@@ -253,15 +220,12 @@ export default function Register() {
               <p className="text-xs font-medium text-gray-600 mb-2">Objectifs professionnels</p>
               <div className="flex flex-wrap gap-2">
                 {objectifsListe.map(obj => (
-                  <button
-                    key={obj}
-                    onClick={() => toggleItem(form.objectifs, obj, 'objectifs')}
+                  <button key={obj} onClick={() => toggleItem(form.objectifs, obj, 'objectifs')}
                     className={`text-xs px-3 py-1.5 rounded-full border transition-all ${
                       form.objectifs.includes(obj)
                         ? 'bg-blue-600 text-white border-blue-600'
                         : 'border-gray-200 text-gray-600 hover:border-blue-300'
-                    }`}
-                  >
+                    }`}>
                     {obj}
                   </button>
                 ))}
@@ -272,15 +236,12 @@ export default function Register() {
               <p className="text-xs font-medium text-gray-600 mb-2">Domaines d'intérêt</p>
               <div className="flex flex-wrap gap-2">
                 {domainesListe.map(dom => (
-                  <button
-                    key={dom}
-                    onClick={() => toggleItem(form.domaines, dom, 'domaines')}
+                  <button key={dom} onClick={() => toggleItem(form.domaines, dom, 'domaines')}
                     className={`text-xs px-3 py-1.5 rounded-full border transition-all ${
                       form.domaines.includes(dom)
                         ? 'bg-blue-600 text-white border-blue-600'
                         : 'border-gray-200 text-gray-600 hover:border-blue-300'
-                    }`}
-                  >
+                    }`}>
                     {dom}
                   </button>
                 ))}
@@ -290,17 +251,12 @@ export default function Register() {
             {erreur && <p className="text-xs text-red-500">{erreur}</p>}
 
             <div className="flex gap-3">
-              <button
-                onClick={() => setEtape(2)}
-                className="flex-1 py-3 rounded-xl border border-gray-200 text-gray-600 text-sm hover:bg-gray-50 transition-colors"
-              >
+              <button onClick={() => setEtape(2)}
+                className="flex-1 py-3 rounded-xl border border-gray-200 text-gray-600 text-sm hover:bg-gray-50 transition-colors">
                 ← Retour
               </button>
-              <button
-                onClick={soumettre}
-                disabled={chargement}
-                className="flex-1 bg-blue-600 text-white py-3 rounded-xl font-medium hover:bg-blue-700 transition-colors text-sm disabled:opacity-60"
-              >
+              <button onClick={soumettre} disabled={chargement}
+                className="flex-1 bg-blue-600 text-white py-3 rounded-xl font-medium hover:bg-blue-700 transition-colors text-sm disabled:opacity-60">
                 {chargement ? 'Création...' : 'Créer mon compte'}
               </button>
             </div>
@@ -318,7 +274,7 @@ export default function Register() {
             <div>
               <h1 className="text-xl font-bold text-gray-900">Bienvenue, {form.prenom} !</h1>
               <p className="text-sm text-gray-500 mt-2">
-                Ton compte NOVI a été créé avec succès. Ton parcours personnalisé est en cours de génération.
+                Ton compte NOVI a été créé avec succès.
               </p>
             </div>
             <div className="bg-blue-50 rounded-xl p-4 text-left">
@@ -326,10 +282,8 @@ export default function Register() {
               <p className="text-xs text-blue-600">Niveau : {form.niveau}</p>
               <p className="text-xs text-blue-600 mt-1">Domaines : {form.domaines.join(', ')}</p>
             </div>
-            <Link
-              href="/dashboard"
-              className="block w-full bg-blue-600 text-white py-3 rounded-xl font-medium hover:bg-blue-700 transition-colors text-sm"
-            >
+            <Link href="/dashboard"
+              className="block w-full bg-blue-600 text-white py-3 rounded-xl font-medium hover:bg-blue-700 transition-colors text-sm">
               Accéder à mon tableau de bord →
             </Link>
           </div>

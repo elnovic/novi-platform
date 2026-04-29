@@ -3,18 +3,31 @@
 import Link from 'next/link'
 import Image from 'next/image'
 import { usePathname } from 'next/navigation'
+import { useEffect, useState } from 'react'
+import { getUtilisateurConnecte, deconnecterUtilisateur } from '@/lib/supabase'
 
 export default function Navbar() {
   const pathname = usePathname()
+  const [utilisateur, setUtilisateur] = useState<any>(null)
+
+  useEffect(() => {
+    getUtilisateurConnecte().then(setUtilisateur).catch(() => setUtilisateur(null))
+  }, [pathname])
+
+  const seDeconnecter = async () => {
+    await deconnecterUtilisateur()
+    setUtilisateur(null)
+    window.location.href = '/'
+  }
 
   const liens = [
     { href: '/academie', label: 'Académie' },
     { href: '/opportunity', label: 'Opportunity' },
     { href: '/research', label: 'Research' },
-    { href: '/innovation', label: 'Innovation' }
+    { href: '/innovation', label: 'Innovation' },
+    { href: '/about', label: 'À propos' }
   ]
 
-  // Ne pas afficher la navbar sur login/register
   if (pathname === '/login' || pathname === '/register' ||
       pathname === '/opportunity/profil/creer') return null
 
@@ -45,18 +58,37 @@ export default function Navbar() {
       </div>
 
       <div className="flex items-center gap-3">
-        <Link href="/dashboard"
-          className="text-sm text-gray-600 hover:text-blue-600 transition-colors font-medium">
-          Mon espace
-        </Link>
-        <Link href="/login"
-          className="text-sm text-gray-600 hover:text-blue-600 transition-colors">
-          Connexion
-        </Link>
-        <Link href="/register"
-          className="text-sm bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors font-medium">
-          Commencer
-        </Link>
+        {utilisateur ? (
+          <>
+            <Link href="/dashboard" className="flex items-center gap-2">
+              <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center">
+                <span className="text-white text-xs font-bold">
+                  {utilisateur.prenom?.[0]}{utilisateur.nom?.[0]}
+                </span>
+              </div>
+              <span className="text-sm text-gray-700 font-medium">
+                {utilisateur.prenom}
+              </span>
+            </Link>
+            <button
+              onClick={seDeconnecter}
+              className="text-xs text-gray-400 hover:text-red-500 transition-colors"
+            >
+              Déconnexion
+            </button>
+          </>
+        ) : (
+          <>
+            <Link href="/login"
+              className="text-sm text-gray-600 hover:text-blue-600 transition-colors font-medium">
+              Connexion
+            </Link>
+            <Link href="/register"
+              className="text-sm bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors font-medium">
+              Commencer
+            </Link>
+          </>
+        )}
       </div>
     </nav>
   )
