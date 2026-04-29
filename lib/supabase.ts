@@ -61,17 +61,39 @@ export async function deconnecterUtilisateur() {
 }
 
 export async function getUtilisateurConnecte() {
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) return null
+  try {
+    const { data: { user }, error: authError } = await supabase.auth.getUser()
+    if (authError || !user) return null
 
-  const { data, error } = await supabase
-    .from('utilisateurs')
-    .select('*')
-    .eq('auth_id', user.id)
-    .single()
+    // Chercher d'abord par auth_id
+    const { data: parAuthId } = await supabase
+      .from('utilisateurs')
+      .select('*')
+      .eq('auth_id', user.id)
+      .single()
 
-  if (error) return null
-  return data
+    if (parAuthId) return parAuthId
+
+    // Si pas trouvé par auth_id, chercher par email et mettre à jour
+    const { data: parEmail } = await supabase
+      .from('utilisateurs')
+      .select('*')
+      .eq('email', user.email!)
+      .single()
+
+    if (parEmail) {
+      // Mettre à jour l'auth_id manquant
+      await supabase
+        .from('utilisateurs')
+        .update({ auth_id: user.id })
+        .eq('email', user.email!)
+      return parEmail
+    }
+
+    return null
+  } catch {
+    return null
+  }
 }
 
 export async function ecouterAuthChangements(callback: (user: any) => void) {
