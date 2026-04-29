@@ -28,28 +28,20 @@ export async function inscrireUtilisateur(data: {
   })
   if (authError) throw authError
 
-  // 2. Vérifier si le profil existe déjà
-  const { data: existant } = await supabase
+  // 2. Créer ou mettre à jour le profil avec upsert
+  const { error: profileError } = await supabase
     .from('utilisateurs')
-    .select('id')
-    .eq('email', data.email)
-    .single()
+    .upsert({
+      auth_id: authData.user?.id,
+      nom: data.nom,
+      prenom: data.prenom,
+      email: data.email,
+      niveau: data.niveau,
+      objectifs: data.objectifs,
+      domaines: data.domaines
+    }, { onConflict: 'email' })
 
-  // 3. Créer le profil seulement s'il n'existe pas
-  if (!existant) {
-    const { error: profileError } = await supabase
-      .from('utilisateurs')
-      .insert({
-        auth_id: authData.user?.id,
-        nom: data.nom,
-        prenom: data.prenom,
-        email: data.email,
-        niveau: data.niveau,
-        objectifs: data.objectifs,
-        domaines: data.domaines
-      })
-    if (profileError) throw profileError
-  }
+  if (profileError) throw profileError
 
   return authData
 }
