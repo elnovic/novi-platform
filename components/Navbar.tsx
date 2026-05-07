@@ -20,10 +20,9 @@ export default function Navbar() {
     window.location.href = '/'
   }
 
-  const liens = [
+ const liens = [
   { href: '/academie', label: 'Académie' },
   { href: '/opportunity', label: 'Opportunity' },
-  { href: '/messages', label: 'Messages' },
   { href: '/research', label: 'Research' },
   { href: '/innovation', label: 'Innovation' },
   { href: '/about', label: 'À propos' }
