@@ -420,3 +420,25 @@ export async function uploadAvatar(utilisateur_id: string, fichier: File) {
   const { data } = supabase.storage.from('avatars').getPublicUrl(chemin)
   return data.publicUrl
 }
+
+// ─── PUBLICATIONS V2 ───
+export async function uploadPublication(fichier: File, pubId: string) {
+  const extension = fichier.name.split('.').pop()
+  const chemin = `publications/${pubId}.${extension}`
+
+  const { error } = await supabase.storage
+    .from('publications')
+    .upload(chemin, fichier, { upsert: true })
+  if (error) throw error
+
+  const { data } = supabase.storage.from('publications').getPublicUrl(chemin)
+  return data.publicUrl
+}
+
+export async function incrementerVues(id: string) {
+  await supabase.rpc('incrementer_vues', { pub_id: id })
+}
+
+export async function incrementerTelechargements(id: string) {
+  await supabase.rpc('incrementer_telechargements', { pub_id: id })
+}
