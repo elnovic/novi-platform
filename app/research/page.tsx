@@ -107,7 +107,9 @@ export default function Research() {
 
   const telecharger = async (pub: any) => {
     if (!pub.fichier_url) return
-    await supabase.rpc('incrementer_telechargements', { pub_id: pub.id }).catch(() => {})
+    try {
+      await supabase.rpc('incrementer_telechargements', { pub_id: pub.id })
+    } catch {}
     window.open(pub.fichier_url, '_blank')
   }
 
