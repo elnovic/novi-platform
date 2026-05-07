@@ -21,12 +21,13 @@ export default function Navbar() {
   }
 
   const liens = [
-    { href: '/academie', label: 'Académie' },
-    { href: '/opportunity', label: 'Opportunity' },
-    { href: '/research', label: 'Research' },
-    { href: '/innovation', label: 'Innovation' },
-    { href: '/about', label: 'À propos' }
-  ]
+  { href: '/academie', label: 'Académie' },
+  { href: '/opportunity', label: 'Opportunity' },
+  { href: '/messages', label: 'Messages' },
+  { href: '/research', label: 'Research' },
+  { href: '/innovation', label: 'Innovation' },
+  { href: '/about', label: 'À propos' }
+]
 
   if (pathname === '/login' || pathname === '/register' ||
       pathname === '/opportunity/profil/creer') return null

@@ -285,3 +285,138 @@ export async function getOpportunites() {
   if (error) throw error
   return data || []
 }
+
+// ─── MESSAGES / CHAT ───
+export async function envoyerMessage(expediteur_id: string, destinataire_id: string, contenu: string) {
+  const { data, error } = await supabase
+    .from('messages')
+    .insert({ expediteur_id, destinataire_id, contenu })
+    .select()
+    .single()
+  if (error) throw error
+  return data
+}
+
+export async function getMessages(utilisateur1_id: string, utilisateur2_id: string) {
+  const { data, error } = await supabase
+    .from('messages')
+    .select('*')
+    .or(`and(expediteur_id.eq.${utilisateur1_id},destinataire_id.eq.${utilisateur2_id}),and(expediteur_id.eq.${utilisateur2_id},destinataire_id.eq.${utilisateur1_id})`)
+    .order('created_at', { ascending: true })
+  if (error) throw error
+  return data || []
+}
+
+export async function getConversations(utilisateur_id: string) {
+  const { data, error } = await supabase
+    .from('messages')
+    .select('*, expediteur:expediteur_id(*), destinataire:destinataire_id(*)')
+    .or(`expediteur_id.eq.${utilisateur_id},destinataire_id.eq.${utilisateur_id}`)
+    .order('created_at', { ascending: false })
+  if (error) throw error
+  return data || []
+}
+
+export async function marquerMessagesLus(expediteur_id: string, destinataire_id: string) {
+  const { error } = await supabase
+    .from('messages')
+    .update({ lu: true })
+    .eq('expediteur_id', expediteur_id)
+    .eq('destinataire_id', destinataire_id)
+  if (error) throw error
+}
+
+// ─── CONNEXIONS ───
+export async function demanderConnexion(demandeur_id: string, receveur_id: string) {
+  const { data, error } = await supabase
+    .from('connexions')
+    .insert({ demandeur_id, receveur_id, statut: 'en_attente' })
+    .select()
+    .single()
+  if (error) throw error
+  return data
+}
+
+export async function accepterConnexion(connexion_id: string) {
+  const { data, error } = await supabase
+    .from('connexions')
+    .update({ statut: 'acceptee' })
+    .eq('id', connexion_id)
+    .select()
+    .single()
+  if (error) throw error
+  return data
+}
+
+export async function getConnexions(utilisateur_id: string) {
+  const { data, error } = await supabase
+    .from('connexions')
+    .select('*, demandeur:demandeur_id(*), receveur:receveur_id(*)')
+    .or(`demandeur_id.eq.${utilisateur_id},receveur_id.eq.${utilisateur_id}`)
+    .eq('statut', 'acceptee')
+  if (error) throw error
+  return data || []
+}
+
+export async function getStatutConnexion(demandeur_id: string, receveur_id: string) {
+  const { data } = await supabase
+    .from('connexions')
+    .select('*')
+    .or(`and(demandeur_id.eq.${demandeur_id},receveur_id.eq.${receveur_id}),and(demandeur_id.eq.${receveur_id},receveur_id.eq.${demandeur_id})`)
+    .single()
+  return data
+}
+
+// ─── NOTIFICATIONS ───
+export async function getNotifications(utilisateur_id: string) {
+  const { data, error } = await supabase
+    .from('notifications')
+    .select('*')
+    .eq('utilisateur_id', utilisateur_id)
+    .order('created_at', { ascending: false })
+    .limit(20)
+  if (error) throw error
+  return data || []
+}
+
+export async function marquerNotificationLue(id: string) {
+  const { error } = await supabase
+    .from('notifications')
+    .update({ lu: true })
+    .eq('id', id)
+  if (error) throw error
+}
+
+// ─── PROFIL COMPLET ───
+export async function getProfilComplet(utilisateur_id: string) {
+  const { data, error } = await supabase
+    .from('profils_opportunity')
+    .select('*')
+    .eq('utilisateur_id', utilisateur_id)
+    .single()
+  if (error) return null
+  return data
+}
+
+export async function updateProfil(utilisateur_id: string, data: any) {
+  const { data: profil, error } = await supabase
+    .from('profils_opportunity')
+    .upsert({ ...data, utilisateur_id })
+    .select()
+    .single()
+  if (error) throw error
+  return profil
+}
+
+export async function uploadAvatar(utilisateur_id: string, fichier: File) {
+  const extension = fichier.name.split('.').pop()
+  const chemin = `avatars/${utilisateur_id}.${extension}`
+
+  const { error: uploadError } = await supabase.storage
+    .from('avatars')
+    .upload(chemin, fichier, { upsert: true })
+  if (uploadError) throw uploadError
+
+  const { data } = supabase.storage.from('avatars').getPublicUrl(chemin)
+  return data.publicUrl
+}
