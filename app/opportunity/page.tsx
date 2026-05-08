@@ -72,8 +72,8 @@ export default function Opportunity() {
 
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-10">
             {[
-              { label: "Talents", valeur: profils.length > 0 ? profils.length : '1 200+' },
-              { label: "Opportunités", valeur: opportunites.length > 0 ? opportunites.length : '340+' },
+              { label: "Talents", valeur: chargement ? '...' : profils.length },
+              { label: "Opportunités", valeur: chargement ? '...' : opportunites.length },
               { label: "Entreprises", valeur: "85+" },
               { label: "Pays", valeur: "42" }
             ].map(s => (
