@@ -17,7 +17,7 @@ export default function Home() {
 
           {/* Logo */}
           <div className="flex items-center gap-4 mb-10">
-            <Image src="/logo.png" alt="NOVI" width={80} height={80} />
+            <Image src="/logo.png" alt="NOVI" width={120} height={120} />
             <div className="text-left">
               <h1 className="text-5xl font-black tracking-widest text-white">NOVi</h1>
               <p className="text-blue-400 tracking-widest uppercase text-sm font-medium">Ecosystem</p>
@@ -97,7 +97,6 @@ export default function Home() {
                 href: "/academie",
                 titre: "Novi Académie",
                 desc: "Cours certifiés en IA, IOT, Robotique et plus. Quiz interactifs, projets pratiques et examens oraux.",
-                couleur: "blue",
                 icon: "📚",
                 features: ["Cours certifiés NOVI", "Quiz & exercices pratiques", "Examen oral IA", "Certificats téléchargeables"]
               },
@@ -105,7 +104,6 @@ export default function Home() {
                 href: "/opportunity",
                 titre: "Novi Opportunity",
                 desc: "Réseau professionnel tech. Connecte-toi avec des entreprises du monde entier.",
-                couleur: "green",
                 icon: "💼",
                 features: ["Profil professionnel", "Chat temps réel", "Offres de stage & CDI", "Partenariats recherche"]
               },
@@ -113,7 +111,6 @@ export default function Home() {
                 href: "/research",
                 titre: "Novi Research & Book",
                 desc: "Publie et découvre des articles, livres et thèses technologiques validés par l'IA.",
-                couleur: "purple",
                 icon: "📄",
                 features: ["Upload PDF", "Lecteur intégré", "Validation IA", "Diffusion mondiale"]
               },
@@ -121,7 +118,6 @@ export default function Home() {
                 href: "/innovation",
                 titre: "Novi Innovation",
                 desc: "Carte mondiale des évolutions technologiques. Startups, investissements et tendances en temps réel.",
-                couleur: "amber",
                 icon: "🌍",
                 features: ["Carte interactive", "Actualités en direct", "Scores d'innovation", "Veille IA"]
               }
@@ -195,7 +191,7 @@ export default function Home() {
       {/* CTA Final */}
       <section className="px-8 py-20 bg-gray-950 text-white text-center">
         <div className="max-w-3xl mx-auto">
-          <Image src="/logo.png" alt="NOVI" width={64} height={64} className="mx-auto mb-6" />
+          <Image src="/logo.png" alt="NOVI" width={90} height={90} className="mx-auto mb-6" />
           <h2 className="text-4xl font-bold mb-4">Prêt à rejoindre NOVI ?</h2>
           <p className="text-gray-400 mb-8 text-lg">
             Commence gratuitement aujourd'hui. Apprends, construis et trouve ta place dans l'économie technologique mondiale.
